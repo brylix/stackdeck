@@ -59,6 +59,39 @@ async function refresh() {
   }
 }
 
+const DATA = "/Users/cyasitha/Library/Application Support/Stackdeck";
+const PRESETS = {
+  mariadb: {
+    name: "mariadb",
+    program: "/opt/homebrew/opt/mariadb/bin/mariadbd",
+    args: `--datadir="${DATA}/data" --port=3306 --socket=/tmp/stackdeck.sock`,
+  },
+  "php-8.5": {
+    name: "php8.5",
+    program: "/opt/homebrew/opt/php/sbin/php-fpm",
+    args: "--fpm-config=/Users/cyasitha/Documents/Projects/rust/stackdeck/presets/php85-fpm.conf",
+  },
+  "php-8.3": {
+    name: "php8.3",
+    program: "/opt/homebrew/opt/php@8.3/sbin/php-fpm",
+    args: "--fpm-config=/Users/cyasitha/Documents/Projects/rust/stackdeck/presets/php83-fpm.conf",
+  },
+  "php-8.1": {
+    name: "php8.1",
+    program: "/opt/homebrew/opt/php@8.1/sbin/php-fpm",
+    args: "--fpm-config=/Users/cyasitha/Documents/Projects/rust/stackdeck/presets/php81-fpm.conf",
+  },
+};
+
+document.getElementById("preset").addEventListener("change", (event) => {
+  const preset = PRESETS[event.target.value];
+  if (!preset) return;
+  const form = document.getElementById("start-form");
+  form.elements.name.value = preset.name;
+  form.elements.program.value = preset.program;
+  form.elements.args.value = preset.args;
+});
+
 document.getElementById("start-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   const data = new FormData(event.target);

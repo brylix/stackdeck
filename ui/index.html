@@ -24,6 +24,15 @@
       <section aria-labelledby="start-h">
         <h2 id="start-h">Start a process</h2>
         <form id="start-form">
+          <label>Preset
+            <select name="preset" id="preset">
+              <option value="">— choose —</option>
+              <option value="mariadb">MariaDB</option>
+              <option value="php-8.5">PHP 8.5 FPM (latest)</option>
+              <option value="php-8.3">PHP 8.3 FPM</option>
+              <option value="php-8.1">PHP 8.1 FPM (legacy)</option>
+            </select>
+          </label>
           <label>Name <input name="name" value="mariadb" required /></label>
           <label>Program <input name="program" value="/opt/homebrew/opt/mariadb/bin/mariadbd" required /></label>
           <label>Args <input name="args" value='--datadir="/Users/cyasitha/Library/Application Support/Stackdeck/data" --port=3306 --socket=/tmp/stackdeck.sock' /></label>

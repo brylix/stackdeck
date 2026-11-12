@@ -57,9 +57,30 @@ still reaps `mysqld`. Without this, the data directory and port stay held.
 - Linux (WebKitGTK patch lag is a separate problem)
 - Bundling a browser engine
 
+## PHP
+
+Versions are keg-only and never on `PATH`; each has its own FPM pool and unix
+socket under app data, so they coexist without port arguments.
+
+| Preset | Pool | For |
+|---|---|---|
+| `php-8.5` | `php85.sock` | new work; **breaks Laravel ≤ 10** |
+| `php-8.3` | `php83.sock` | Laravel 10/11 |
+| `php-8.1` | `php81.sock` | Laravel 8/9 |
+
+The imported projects constrain this: nine need `^7.3\|^8.0` (Laravel 8),
+one `^8.0.2` (9), two `^8.1` (10), one `^8.2` (11). PHP 8.5 is installed as
+"latest" but is not a safe default for the legacy majority.
+
+`group`/`user` are omitted from the pool files: FPM ignores them unless it
+runs as root, and they only produce notices.
+
 ## Open items
 
 1. Elevated helper for ports 80/443
 2. Signed updater keys + CI release pipeline
 3. Import wizard (dump existing DBs, rewrite `.env`, move docroots to `~/Sites`)
 4. Per-component resolve/verify wiring (`manifest::resolve` → downloader)
+5. Caddy + `php_fastcgi`, so a site can actually serve PHP
+6. phpMyAdmin as a special loopback-only site (installed, not yet served)
+7. Generate pool files at runtime instead of hardcoding this user's paths
