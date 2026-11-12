@@ -222,8 +222,11 @@ pub fn provision_phpmyadmin() -> Result<(), SetupError> {
         "<?php\n\
          $cfg['blowfish_secret'] = '{secret}';\n\
          $cfg['TempDir'] = '{temp}';\n\
+         $i = 1;\n\
+         $cfg['ServerDefault'] = 1;\n\
          $cfg['Servers'][$i]['host'] = '127.0.0.1';\n\
          $cfg['Servers'][$i]['port'] = '3306';\n\
+         $cfg['Servers'][$i]['auth_type'] = 'cookie';\n\
          $cfg['Servers'][$i]['AllowNoPassword'] = false;\n\
          $cfg['CheckConfigurationPermissions'] = false;\n",
         secret = random_hex(24),
