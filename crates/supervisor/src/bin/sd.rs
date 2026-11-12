@@ -1,6 +1,7 @@
 //! Headless driver for smoke-testing the supervisor without the UI.
 
 use stackdeck_supervisor::process::{self, ProcSpec};
+use stackdeck_supervisor::provision;
 
 fn main() {
     let mut args = std::env::args().skip(1);
@@ -32,6 +33,28 @@ fn main() {
         }
         Some("alive") => {
             println!("{}", process::alive(parse_pid(args.next())));
+        }
+        Some("setup-state") => {
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&provision::detect()).unwrap()
+            );
+        }
+        Some("provision") => {
+            let what = args.next().unwrap_or_default();
+            let result = match what.as_str() {
+                "mariadb" => provision::provision_mariadb(),
+                "phpmyadmin" => provision::provision_phpmyadmin(),
+                other => {
+                    eprintln!("unknown component: {other}");
+                    std::process::exit(2);
+                }
+            };
+            if let Err(err) = result {
+                eprintln!("{err}");
+                std::process::exit(1);
+            }
+            println!("provisioned {what}");
         }
         _ => usage(),
     }

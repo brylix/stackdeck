@@ -6,6 +6,7 @@
 pub mod health;
 pub mod manifest;
 pub mod process;
+pub mod provision;
 
 pub use manifest::{Entry, ManifestError};
 pub use process::{ProcError, ProcSpec, Spawned};

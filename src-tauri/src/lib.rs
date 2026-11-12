@@ -1,7 +1,7 @@
 //! Tauri shell: commands only. All real work lives in `stackdeck_supervisor`.
 
 use serde::Serialize;
-use stackdeck_supervisor::{process, ProcSpec};
+use stackdeck_supervisor::{process, provision, ProcSpec};
 use std::path::PathBuf;
 use std::sync::Mutex;
 
@@ -59,6 +59,30 @@ fn running_services(state: tauri::State<State>) -> Vec<Running> {
     running
 }
 
+#[tauri::command]
+fn setup_state() -> provision::State {
+    provision::detect()
+}
+
+/// Homebrew installs take minutes, so this returns immediately and the UI
+/// polls `setup_state` until the component appears.
+#[tauri::command]
+fn install_component(component: String) -> Result<(), String> {
+    std::thread::spawn(move || {
+        let _ = provision::install(&component);
+    });
+    Ok(())
+}
+
+#[tauri::command]
+fn provision_component(component: String) -> Result<(), String> {
+    match component.as_str() {
+        "mariadb" => provision::provision_mariadb().map_err(|e| e.to_string()),
+        "phpmyadmin" => provision::provision_phpmyadmin().map_err(|e| e.to_string()),
+        other => Err(format!("unknown component: {other}")),
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -66,7 +90,10 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             start_service,
             stop_service,
-            running_services
+            running_services,
+            setup_state,
+            install_component,
+            provision_component
         ])
         .run(tauri::generate_context!())
         .expect("error while running Stackdeck");

@@ -13,6 +13,14 @@
     </header>
 
     <main>
+      <section aria-labelledby="setup-h" class="setup">
+        <h2 id="setup-h">Setup</h2>
+        <ul id="setup" class="list">
+          <li class="empty">Checking…</li>
+        </ul>
+        <p class="hint">First run: install each service, then set it up. Credentials are generated for you.</p>
+      </section>
+
       <section aria-labelledby="running-h">
         <h2 id="running-h">Running</h2>
         <ul id="running" class="list">
@@ -28,6 +36,7 @@
             <select name="preset" id="preset">
               <option value="">— choose —</option>
               <option value="mariadb">MariaDB</option>
+              <option value="phpmyadmin">phpMyAdmin (127.0.0.1:8081)</option>
               <option value="php-8.5">PHP 8.5 FPM (latest)</option>
               <option value="php-8.3">PHP 8.3 FPM</option>
               <option value="php-8.1">PHP 8.1 FPM (legacy)</option>

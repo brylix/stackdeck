@@ -31,6 +31,87 @@ function tokenize(input) {
   return out;
 }
 
+const setupList = document.getElementById("setup");
+let pollTimer = null;
+
+function pollWhileSetup() {
+  clearInterval(pollTimer);
+  pollTimer = setInterval(renderSetup, 3000);
+}
+
+async function renderSetup() {
+  if (!invoke) return;
+  let state;
+  try {
+    state = await invoke("setup_state");
+  } catch (err) {
+    setupList.innerHTML = `<li class="empty">${err}</li>`;
+    return;
+  }
+
+  if (!state.brew) {
+    setupList.innerHTML = '<li class="empty">Homebrew not found at /opt/homebrew/bin/brew.</li>';
+    clearInterval(pollTimer);
+    return;
+  }
+
+  const rows = [
+    ["mariadb", "MariaDB", state.mariadb_installed, state.mariadb_provisioned],
+    ["php", "PHP (latest)", state.php_installed, true],
+    ["phpmyadmin", "phpMyAdmin", state.phpmyadmin_installed, state.phpmyadmin_provisioned],
+  ];
+
+  setupList.innerHTML = "";
+  let pending = false;
+  for (const [id, label, installed, provisioned] of rows) {
+    const li = document.createElement("li");
+    li.textContent = label + " ";
+
+    const status = document.createElement("span");
+    status.className = "status";
+    const button = document.createElement("button");
+    button.type = "button";
+
+    if (!installed) {
+      status.textContent = "not installed";
+      status.classList.add("warn");
+      button.textContent = "Install";
+      pending = true;
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        button.textContent = "Installing…";
+        await invoke("install_component", { component: id });
+        pollWhileSetup();
+      });
+    } else if (!provisioned) {
+      status.textContent = "installed, not set up";
+      status.classList.add("warn");
+      button.textContent = "Set up";
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        try {
+          await invoke("provision_component", { component: id });
+          setMessage(`${label} configured`);
+        } catch (err) {
+          setMessage(String(err), true);
+        }
+        renderSetup();
+      });
+    } else {
+      status.textContent = "ready";
+      status.classList.add("ok");
+      button.remove();
+    }
+
+    li.appendChild(status);
+    if (button.isConnected !== false && button.textContent) li.appendChild(button);
+    setupList.appendChild(li);
+  }
+
+  if (pending) pollWhileSetup();
+  else clearInterval(pollTimer);
+}
+
 async function refresh() {
   if (!invoke) return setMessage("Tauri bridge unavailable — run via `cargo tauri dev`.", true);
   const rows = await invoke("running_services");
@@ -65,6 +146,11 @@ const PRESETS = {
     name: "mariadb",
     program: "/opt/homebrew/opt/mariadb/bin/mariadbd",
     args: `--datadir="${DATA}/data" --port=3306 --socket=/tmp/stackdeck.sock`,
+  },
+  phpmyadmin: {
+    name: "phpmyadmin",
+    program: "/opt/homebrew/opt/php/bin/php",
+    args: `-S 127.0.0.1:8081 -t "${DATA}/phpmyadmin"`,
   },
   "php-8.5": {
     name: "php8.5",
@@ -112,3 +198,4 @@ document.getElementById("start-form").addEventListener("submit", async (event) =
 
 document.getElementById("refresh").addEventListener("click", refresh);
 refresh();
+renderSetup();
