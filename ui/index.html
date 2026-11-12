@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stackdeck</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Stackdeck</h1>
+      <p class="sub">Local PHP · MariaDB · Caddy — loopback only</p>
+    </header>
+
+    <main>
+      <section aria-labelledby="running-h">
+        <h2 id="running-h">Running</h2>
+        <ul id="running" class="list">
+          <li class="empty">Nothing running.</li>
+        </ul>
+        <button id="refresh" type="button">Refresh</button>
+      </section>
+
+      <section aria-labelledby="start-h">
+        <h2 id="start-h">Start a process</h2>
+        <form id="start-form">
+          <label>Name <input name="name" value="mariadb" required /></label>
+          <label>Program <input name="program" value="/opt/homebrew/bin/mariadbd" required /></label>
+          <label>Args <input name="args" value="--datadir=/tmp/sd-data" /></label>
+          <button type="submit">Start</button>
+        </form>
+        <p id="msg" class="msg" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

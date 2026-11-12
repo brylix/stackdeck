@@ -1,0 +1,1 @@
+{"ui":{"identifier":"ui","description":"Capabilities for the local UI window only. No remote origin gets IPC.","local":true,"windows":["main"],"permissions":["core:default","core:window:allow-start-dragging"]}}
