@@ -9,7 +9,10 @@ use std::fs;
 use std::io::Read;
 use std::path::PathBuf;
 
+// TODO(win): Homebrew does not exist on Windows. This whole layer needs to
+// become manifest-driven (download + hash verify + extract) before the port.
 const BREW: &str = "/opt/homebrew/bin/brew";
+// TODO(win): Windows has no `security` CLI; use Credential Manager.
 const SECURITY: &str = "/usr/bin/security";
 const KEYCHAIN_SERVICE: &str = "stackdeck-mariadb";
 const SOCKET: &str = "/tmp/stackdeck.sock";
@@ -52,6 +55,7 @@ impl SetupError {
 }
 
 pub fn app_dir() -> PathBuf {
+    // TODO(win): %LOCALAPPDATA%\Stackdeck
     dirs_app_support().join("Stackdeck")
 }
 
@@ -141,6 +145,7 @@ pub fn detect() -> State {
 
 /// Install a component from Homebrew. Blocking; callers should poll `detect`.
 pub fn install(component: &str) -> Result<(), SetupError> {
+    // TODO(win): resolve from `manifest/` and extract instead of shelling to brew.
     if !PathBuf::from(BREW).is_file() {
         return Err(SetupError::NoBrew(BREW.to_string()));
     }
@@ -156,6 +161,8 @@ pub fn install(component: &str) -> Result<(), SetupError> {
 
 /// Initialise the database and set a generated password on every root account.
 pub fn provision_mariadb() -> Result<(), SetupError> {
+    // TODO(win): mariadbd.exe lives in the extracted zip; init is
+    // `mariadb-install-db.exe`. Socket path becomes a TCP port.
     let bin = "/opt/homebrew/opt/mariadb/bin";
     if !PathBuf::from(format!("{bin}/mariadbd")).is_file() {
         return Err(SetupError::Missing("mariadb".into()));
@@ -219,6 +226,7 @@ pub fn provision_mariadb() -> Result<(), SetupError> {
 /// Materialise phpMyAdmin with its own config: generated secret, loopback host,
 /// no passwordless login.
 pub fn provision_phpmyadmin() -> Result<(), SetupError> {
+    // TODO(win): no brew share dir — copy from the extracted phpMyAdmin zip.
     let share = PathBuf::from("/opt/homebrew/share/phpmyadmin");
     if !share.is_dir() {
         return Err(SetupError::Missing("phpmyadmin".into()));

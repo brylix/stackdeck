@@ -15,6 +15,8 @@ pub struct Found {
 }
 
 /// Binaries/commands we know how to recognise. Keep in sync with the presets.
+// TODO(win): these are absolute Homebrew paths; Windows needs exe names under
+// the app data dir.
 const SIGNATURES: &[(&str, &str)] = &[
     ("mariadb", "/opt/homebrew/opt/mariadb/bin/mariadbd"),
     ("php-fpm", "php-fpm: master process"),

@@ -1,0 +1,73 @@
+name: Bug report
+description: Something broke in Stackdeck
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Stackdeck is **macOS only** — Windows is a target, not a working platform.
+
+  - type: input
+    id: os
+    attributes:
+      label: macOS version
+      description: Output of `sw_vers -productVersion`
+      placeholder: "27.0.1"
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Stackdeck version
+      description: Shown in the app, or the tag you built from
+    validations:
+      required: true
+
+  - type: dropdown
+    id: origin
+    attributes:
+      label: How was the service started?
+      description: The app only supervises what it spawned, so this changes the diagnosis.
+      options:
+        - From the app
+        - From a terminal
+        - Not applicable
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Preset → MariaDB
+        2. Start
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: |
+        Paste `~/Library/Application Support/Stackdeck/log/<service>.err.log`, and any terminal output.
+        Redact paths or credentials you don't want public.
+      render: shell
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: Checked the Detected panel for a duplicate already holding the port/socket
+        - label: Read CONTRIBUTING.md
+          required: true

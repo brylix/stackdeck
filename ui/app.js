@@ -195,6 +195,7 @@ async function refresh() {
   }
 }
 
+// TODO(win): absolute macOS paths throughout; presets need a per-OS table.
 const DATA = "/Users/cyasitha/Library/Application Support/Stackdeck";
 const PRESETS = {
   mariadb: {
