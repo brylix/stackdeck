@@ -152,6 +152,11 @@ const PRESETS = {
     program: "/opt/homebrew/opt/php/bin/php",
     args: `-S 127.0.0.1:8081 -t "${DATA}/phpmyadmin"`,
   },
+  caddy: {
+    name: "caddy",
+    program: "/opt/homebrew/opt/caddy/bin/caddy",
+    args: `run --config "${DATA}/Caddyfile" --adapter caddyfile`,
+  },
   "php-8.5": {
     name: "php8.5",
     program: "/opt/homebrew/opt/php/sbin/php-fpm",

@@ -36,6 +36,7 @@
             <select name="preset" id="preset">
               <option value="">— choose —</option>
               <option value="mariadb">MariaDB</option>
+              <option value="caddy">Caddy (sites, 127.0.0.1:8080)</option>
               <option value="phpmyadmin">phpMyAdmin (127.0.0.1:8081)</option>
               <option value="php-8.5">PHP 8.5 FPM (latest)</option>
               <option value="php-8.3">PHP 8.3 FPM</option>
@@ -62,8 +63,9 @@
           stops everything instead of leaving an orphaned database behind.
         </p>
         <p class="warn">
-          Not built yet: per-site virtual hosts and Caddy. Right now Stackdeck manages <em>processes</em>,
-          not <em>sites</em> — there is no <code>myproject.localhost</code> yet.
+          Sites are still hand-written into <code>Caddyfile</code> — there is no add-site form yet, so
+          a new project needs a vhost block added there. Everything else is wired: PHP executes and
+          dotfiles are denied.
         </p>
       </details>
 
@@ -97,6 +99,7 @@
         <table>
           <tr><th>Service</th><th>Address</th><th>Bound to</th></tr>
           <tr><td>MariaDB</td><td><code>127.0.0.1:3306</code>, socket <code>/tmp/stackdeck.sock</code></td><td>all interfaces</td></tr>
+          <tr><td>Caddy (sites)</td><td><code>http://&lt;site&gt;.localhost:8080</code></td><td>loopback only</td></tr>
           <tr><td>phpMyAdmin</td><td><code>http://127.0.0.1:8081</code></td><td>loopback only</td></tr>
           <tr><td>PHP-FPM</td><td>unix socket, no TCP port</td><td>sockets</td></tr>
         </table>

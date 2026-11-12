@@ -23,11 +23,35 @@ when done. Quitting the app stops every child process.
 
 Start MariaDB before anything needing a database; PHP alone serves nothing.
 
+## Serving a site
+
+PHP-FPM executes nothing on its own — it needs a front end. Caddy does that:
+
+1. Add a block to `~/Library/Application Support/Stackdeck/Caddyfile`:
+
+   ```caddyfile
+   http://myproject.localhost:8080 {
+       root * /Users/cyasitha/Sites/myproject/public
+       php_fastcgi "unix//Users/cyasitha/Library/Application Support/Stackdeck/run/php81.sock"
+       file_server {
+           hide .env .git .gitignore
+       }
+   }
+   ```
+
+2. Start the matching PHP preset, then the **Caddy** preset.
+3. Open `http://myproject.localhost:8080`.
+
+`*.localhost` resolves to 127.0.0.1 natively — no DNS or hosts edits. Dotfiles are denied.
+
+There is no add-site form yet; blocks are hand-written.
+
 ## Ports
 
 | Service | Address | Bound |
 |---|---|---|
 | MariaDB | `127.0.0.1:3306`, socket `/tmp/stackdeck.sock` | all interfaces |
+| Caddy (sites) | `http://<site>.localhost:8080` | loopback |
 | phpMyAdmin | `http://127.0.0.1:8081` | loopback |
 | PHP-FPM | unix socket | sockets |
 
