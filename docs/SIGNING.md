@@ -24,8 +24,8 @@ notarization round-trip.
 ## Building a signed, notarized DMG
 
 ```bash
-export APPLE_SIGNING_IDENTITY="Developer ID Application: BRYLIX LLC (8HQRVB7CXJ)"
-export APPLE_TEAM_ID=8HQRVB7CXJ
+export APPLE_SIGNING_IDENTITY="Developer ID Application: BRYLIX LLC (99KHCTD337)"
+export APPLE_TEAM_ID=99KHCTD337
 export APPLE_ID=you@example.com
 export APPLE_PASSWORD="abcd-efgh-ijkl-mnop"   # app-specific password
 
@@ -68,7 +68,7 @@ codesign -dvv --entitlements - /Applications/Stackdeck.app
 | `APPLE_SIGNING_IDENTITY` | full identity string |
 | `APPLE_ID` | Apple ID email |
 | `APPLE_PASSWORD` | app-specific password |
-| `APPLE_TEAM_ID` | `8HQRVB7CXJ` |
+| `APPLE_TEAM_ID` | `99KHCTD337` |
 
 ## Note on child processes
 
