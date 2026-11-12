@@ -41,3 +41,7 @@ Windows from the pinned manifest.
 
 Sites live in `~/Sites` — **not** under `Documents`, which is TCC-protected
 and would force Full Disk Access for the server.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
