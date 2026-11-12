@@ -25,8 +25,8 @@
         <h2 id="start-h">Start a process</h2>
         <form id="start-form">
           <label>Name <input name="name" value="mariadb" required /></label>
-          <label>Program <input name="program" value="/opt/homebrew/bin/mariadbd" required /></label>
-          <label>Args <input name="args" value="--datadir=/tmp/sd-data" /></label>
+          <label>Program <input name="program" value="/opt/homebrew/opt/mariadb/bin/mariadbd" required /></label>
+          <label>Args <input name="args" value='--datadir="/Users/cyasitha/Library/Application Support/Stackdeck/data" --port=3306 --socket=/tmp/stackdeck.sock' /></label>
           <button type="submit">Start</button>
         </form>
         <p id="msg" class="msg" role="status" aria-live="polite"></p>

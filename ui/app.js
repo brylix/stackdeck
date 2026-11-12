@@ -7,6 +7,30 @@ function setMessage(text, bad = false) {
   msg.className = bad ? "msg bad" : "msg";
 }
 
+// Split on whitespace but honour quotes, so a datadir with a space works.
+function tokenize(input) {
+  const out = [];
+  let cur = "";
+  let quote = null;
+  for (const ch of input) {
+    if (quote) {
+      if (ch === quote) quote = null;
+      else cur += ch;
+    } else if (ch === '"' || ch === "'") {
+      quote = ch;
+    } else if (/\s/.test(ch)) {
+      if (cur) {
+        out.push(cur);
+        cur = "";
+      }
+    } else {
+      cur += ch;
+    }
+  }
+  if (cur) out.push(cur);
+  return out;
+}
+
 async function refresh() {
   if (!invoke) return setMessage("Tauri bridge unavailable — run via `cargo tauri dev`.", true);
   const rows = await invoke("running_services");
@@ -38,7 +62,7 @@ async function refresh() {
 document.getElementById("start-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   const data = new FormData(event.target);
-  const args = String(data.get("args") ?? "").split(/\s+/).filter(Boolean);
+  const args = tokenize(String(data.get("args") ?? ""));
   try {
     const pid = await invoke("start_service", {
       name: String(data.get("name")),
