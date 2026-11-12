@@ -1,7 +1,7 @@
 //! Headless driver for smoke-testing the supervisor without the UI.
 
 use stackdeck_supervisor::process::{self, ProcSpec};
-use stackdeck_supervisor::provision;
+use stackdeck_supervisor::{discover, provision};
 
 fn main() {
     let mut args = std::env::args().skip(1);
@@ -33,6 +33,12 @@ fn main() {
         }
         Some("alive") => {
             println!("{}", process::alive(parse_pid(args.next())));
+        }
+        Some("discover") => {
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&discover::scan()).unwrap()
+            );
         }
         Some("setup-state") => {
             println!(

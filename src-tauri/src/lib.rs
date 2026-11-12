@@ -1,7 +1,7 @@
 //! Tauri shell: commands only. All real work lives in `stackdeck_supervisor`.
 
 use serde::Serialize;
-use stackdeck_supervisor::{process, provision, ProcSpec};
+use stackdeck_supervisor::{discover, process, provision, ProcSpec};
 use std::path::PathBuf;
 use std::sync::Mutex;
 
@@ -83,6 +83,33 @@ fn provision_component(component: String) -> Result<(), String> {
     }
 }
 
+#[tauri::command]
+fn discover_services(state: tauri::State<State>) -> Vec<discover::Found> {
+    let tracked: Vec<u32> = state
+        .0
+        .lock()
+        .map(|r| r.iter().map(|x| x.pid).collect())
+        .unwrap_or_default();
+    discover::scan()
+        .into_iter()
+        .filter(|f| !tracked.contains(&f.pid))
+        .collect()
+}
+
+/// Take ownership of a process started outside the app, so Stop and quit work.
+#[tauri::command]
+fn adopt_service(state: tauri::State<State>, pid: u32, name: String) -> Result<(), String> {
+    if !process::alive(pid) {
+        return Err(format!("pid {pid} is gone"));
+    }
+    state
+        .0
+        .lock()
+        .map_err(|_| "state poisoned".to_string())?
+        .push(Running { pid, name });
+    Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -91,6 +118,8 @@ pub fn run() {
             start_service,
             stop_service,
             running_services,
+            discover_services,
+            adopt_service,
             setup_state,
             install_component,
             provision_component

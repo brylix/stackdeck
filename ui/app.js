@@ -112,6 +112,61 @@ async function renderSetup() {
   else clearInterval(pollTimer);
 }
 
+async function renderDetected() {
+  if (!invoke) return;
+  const list = document.getElementById("detected");
+  let rows;
+  try {
+    rows = await invoke("discover_services");
+  } catch {
+    return;
+  }
+  list.innerHTML = "";
+  if (!rows.length) {
+    list.innerHTML = '<li class="empty">Nothing detected.</li>';
+    return;
+  }
+  for (const row of rows) {
+    const li = document.createElement("li");
+    li.textContent = `${row.name} · pid ${row.pid} `;
+
+    const badge = document.createElement("span");
+    badge.className = "status warn";
+    badge.textContent = "unmanaged";
+
+    const track = document.createElement("button");
+    track.type = "button";
+    track.textContent = "Track";
+    track.addEventListener("click", async () => {
+      try {
+        await invoke("adopt_service", { pid: row.pid, name: row.name });
+        setMessage(`now tracking ${row.name}`);
+      } catch (err) {
+        setMessage(String(err), true);
+      }
+      renderDetected();
+      refresh();
+    });
+
+    const stop = document.createElement("button");
+    stop.type = "button";
+    stop.textContent = "Stop";
+    stop.addEventListener("click", async () => {
+      try {
+        await invoke("stop_service", { pid: row.pid });
+      } catch (err) {
+        setMessage(String(err), true);
+      }
+      renderDetected();
+    });
+
+    li.appendChild(badge);
+    li.appendChild(track);
+    li.appendChild(stop);
+    list.appendChild(li);
+  }
+}
+
 async function refresh() {
   if (!invoke) return setMessage("Tauri bridge unavailable — run via `cargo tauri dev`.", true);
   const rows = await invoke("running_services");
@@ -204,3 +259,6 @@ document.getElementById("start-form").addEventListener("submit", async (event) =
 document.getElementById("refresh").addEventListener("click", refresh);
 refresh();
 renderSetup();
+renderDetected();
+setInterval(renderDetected, 4000);
+setInterval(refresh, 4000);

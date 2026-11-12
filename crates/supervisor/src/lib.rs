@@ -3,6 +3,7 @@
 //! Kept free of Tauri so it can be unit-tested and, if ever needed, driven
 //! headlessly.
 
+pub mod discover;
 pub mod health;
 pub mod manifest;
 pub mod process;
