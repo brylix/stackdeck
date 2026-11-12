@@ -46,6 +46,31 @@ PHP-FPM executes nothing on its own — it needs a front end. Caddy does that:
 
 There is no add-site form yet; blocks are hand-written.
 
+## Browse any folder on one host
+
+A generic block serves every folder in `~/Sites` at `http://localhost:8080/<folder>/`,
+with dotfiles denied and directory listing enabled. `docs/Caddyfile.example`
+holds a copy.
+
+Works well for plain-PHP apps — `http://localhost:8080/erp/` reaches the ERP
+login page.
+
+Limits, all real:
+
+- **Laravel apps need `/public/`** appended: `.../bowwow/public/`. Their
+  `index.php` lives there, so the bare folder falls through to the root
+  `index.php` and lands on the dashboard page instead.
+- **One PHP version for every folder.** The portal pins 8.1; apps needing 8.3
+  or 8.5 need their own `.localhost` block.
+- **Cookies collide.** All folders share the `localhost` host, so apps using
+  `PHPSESSID` overwrite each other's session — logging into one logs you out
+  of another.
+- **Absolute asset paths break** under a prefix; apps emitting `/css/app.css`
+  resolve to the portal root, not `/erp/css/app.css`.
+
+Use the portal for quick checks; keep a `.localhost` block per app for real
+work, especially Laravel.
+
 ## Ports
 
 | Service | Address | Bound |

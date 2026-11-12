@@ -1,0 +1,38 @@
+{
+	admin 127.0.0.1:2019
+	auto_https off
+}
+
+# One block per site. Host is *.localhost, which resolves to 127.0.0.1
+# natively on macOS and Windows — no DNS or hosts-file entries.
+http://bowwow.localhost:8080 {
+	root * /Users/cyasitha/Sites/bowwow/public
+	encode gzip
+	php_fastcgi "unix//Users/cyasitha/Library/Application Support/Stackdeck/run/php81.sock"
+	file_server {
+		hide .env .git .gitignore
+	}
+}
+
+http://erp.localhost:8080 {
+	root * /Users/cyasitha/Sites/erp
+	encode gzip
+	php_fastcgi "unix//Users/cyasitha/Library/Application Support/Stackdeck/run/php81.sock"
+	file_server {
+		hide .env .git .gitignore
+	}
+}
+
+# Auto-serve any folder in ~/Sites as /<folder>/ on one host.
+http://localhost:8080 {
+	root * /Users/cyasitha/Sites
+	@hidden path */.*
+	handle @hidden {
+		respond 404
+	}
+	handle {
+		encode gzip
+		php_fastcgi "unix//Users/cyasitha/Library/Application Support/Stackdeck/run/php81.sock"
+		file_server browse
+	}
+}
