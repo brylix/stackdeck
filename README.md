@@ -1,8 +1,10 @@
 # Stackdeck
 
-A local dev-stack manager: pinned PHP, MariaDB and Caddy, per-site virtual
-hosts on `*.localhost`, loopback-only by default, credentials generated on
-first run.
+A local dev-stack manager: pinned PHP, MariaDB and Apache, per-folder localhost
+hosting, loopback-only by default, credentials generated on first run.
+
+**macOS only** — Windows is a target, not supported yet. Roadmap in
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 Built because XAMPP's bundled Apache 2.4.56 / PHP 8.2.4 / OpenSSL 1.1.1t are
 frozen at install time and bind `0.0.0.0` with a blank database root password.

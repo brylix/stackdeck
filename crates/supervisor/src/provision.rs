@@ -74,6 +74,26 @@ pub fn exists(path: &std::path::Path) -> bool {
     path.exists()
 }
 
+#[cfg(unix)]
+fn link_entry(src: &std::path::Path, dst: &std::path::Path) -> std::io::Result<()> {
+    std::os::unix::fs::symlink(src, dst)
+}
+
+/// Windows needs no symlink privilege if we just copy.
+#[cfg(windows)]
+fn link_entry(src: &std::path::Path, dst: &std::path::Path) -> std::io::Result<()> {
+    if src.is_dir() {
+        fs::create_dir_all(dst)?;
+        for entry in fs::read_dir(src)? {
+            let entry = entry?;
+            link_entry(&entry.path(), &dst.join(entry.file_name()))?;
+        }
+        Ok(())
+    } else {
+        fs::copy(src, dst).map(|_| ())
+    }
+}
+
 fn random_hex(bytes: usize) -> String {
     let mut buf = vec![0u8; bytes];
     if let Ok(mut f) = fs::File::open("/dev/urandom") {
@@ -206,13 +226,12 @@ pub fn provision_phpmyadmin() -> Result<(), SetupError> {
     let dir = phpmyadmin_dir();
     fs::create_dir_all(&dir).map_err(|e| SetupError::io(&dir, e))?;
 
-    // Symlink the application files, then own only the config.
+    // Symlinks on unix, copies on Windows (no link privilege needed).
     for entry in fs::read_dir(&share).map_err(|e| SetupError::io(&share, e))? {
         let entry = entry.map_err(|e| SetupError::io(&share, e))?;
         let target = dir.join(entry.file_name());
         if target.symlink_metadata().is_err() {
-            std::os::unix::fs::symlink(entry.path(), &target)
-                .map_err(|e| SetupError::io(&target, e))?;
+            link_entry(&entry.path(), &target).map_err(|e| SetupError::io(&target, e))?;
         }
     }
 

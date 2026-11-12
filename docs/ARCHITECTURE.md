@@ -75,6 +75,27 @@ one `^8.0.2` (9), two `^8.1` (10), one `^8.2` (11). PHP 8.5 is installed as
 `group`/`user` are omitted from the pool files: FPM ignores them unless it
 runs as root, and they only produce notices.
 
+## Windows roadmap
+
+Windows is a target, not supported yet. The supervisor already compiles for
+`x86_64-pc-windows-msvc`; the rest is unwritten.
+
+Done: job objects with `KILL_ON_JOB_CLOSE`, `cfg`-gated symlink (copies instead),
+`Win32_Security` features.
+
+Remaining:
+
+1. Component downloader/extractor from `manifest/` — Homebrew is macOS-only
+2. Credential store via Credential Manager, not Keychain
+3. `%LOCALAPPDATA%` paths instead of `/opt/homebrew/...`
+4. `php-cgi` SAPI + Caddy/Apache on Windows instead of FPM
+5. Port 80 via `netsh portproxy` (no pf)
+6. WebView2 presence check and installer
+7. Real Windows testing — the app is signed and packaged with MSI
+
+Cross-compiling the app from macOS additionally needs `llvm-rc`; CI builds it
+natively on `windows-latest` instead.
+
 ## Open items
 
 1. Elevated helper for ports 80/443

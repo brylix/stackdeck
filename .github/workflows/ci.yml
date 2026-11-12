@@ -25,6 +25,11 @@ jobs:
         run: cargo clippy --workspace --all-targets -- -D warnings
       - name: Test
         run: cargo test --workspace
+      - name: Cross-check supervisor for Windows
+        if: runner.os == 'macOS'
+        run: |
+          rustup target add x86_64-pc-windows-msvc
+          cargo check -p stackdeck-supervisor --target x86_64-pc-windows-msvc
       - name: Audit
         run: |
           cargo install cargo-audit --locked || true
