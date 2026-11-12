@@ -36,7 +36,7 @@
             <select name="preset" id="preset">
               <option value="">— choose —</option>
               <option value="mariadb">MariaDB</option>
-              <option value="caddy">Caddy (sites, 127.0.0.1:8080)</option>
+              <option value="apache">Apache (sites, 127.0.0.1:8080)</option>
               <option value="phpmyadmin">phpMyAdmin (127.0.0.1:8081)</option>
               <option value="php-8.5">PHP 8.5 FPM (latest)</option>
               <option value="php-8.3">PHP 8.3 FPM</option>
@@ -63,9 +63,9 @@
           stops everything instead of leaving an orphaned database behind.
         </p>
         <p class="warn">
-          Sites are still hand-written into <code>Caddyfile</code> — there is no add-site form yet, so
-          a new project needs a vhost block added there. Everything else is wired: PHP executes and
-          dotfiles are denied.
+          Apache serves every folder as <code>http://127.0.0.1:8080/&lt;folder&gt;/</code> and
+          <strong>honours each project's <code>.htaccess</code></strong> — rewrites, ErrorDocument
+          and auth rules all apply. Dotfiles are denied globally.
         </p>
       </details>
 
@@ -99,7 +99,7 @@
         <table>
           <tr><th>Service</th><th>Address</th><th>Bound to</th></tr>
           <tr><td>MariaDB</td><td><code>127.0.0.1:3306</code>, socket <code>/tmp/stackdeck.sock</code></td><td>all interfaces</td></tr>
-          <tr><td>Caddy (sites)</td><td><code>http://&lt;site&gt;.localhost:8080</code></td><td>loopback only</td></tr>
+          <tr><td>Apache (sites)</td><td><code>http://127.0.0.1:8080/&lt;folder&gt;/</code></td><td>loopback only</td></tr>
           <tr><td>phpMyAdmin</td><td><code>http://127.0.0.1:8081</code></td><td>loopback only</td></tr>
           <tr><td>PHP-FPM</td><td>unix socket, no TCP port</td><td>sockets</td></tr>
         </table>

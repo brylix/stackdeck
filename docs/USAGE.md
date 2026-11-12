@@ -25,43 +25,24 @@ Start MariaDB before anything needing a database; PHP alone serves nothing.
 
 ## Serving a site
 
-PHP-FPM executes nothing on its own — it needs a front end. Caddy does that:
+Apache serves everything under `~/Sites` at `http://127.0.0.1:8080/<folder>/`.
+Start MariaDB and the matching PHP preset, then the **Apache** preset.
 
-1. Add a block to `~/Library/Application Support/Stackdeck/Caddyfile`:
+Each project's `.htaccess` applies — `AllowOverride All` is set, so rewrites,
+`ErrorDocument`, auth and `php_value` behave as they did under XAMPP. Dotfiles
+(`.env`, `.git`) are denied in the server config.
 
-   ```caddyfile
-   http://myproject.localhost:8080 {
-       root * /Users/cyasitha/Sites/myproject/public
-       php_fastcgi "unix//Users/cyasitha/Library/Application Support/Stackdeck/run/php81.sock"
-       file_server {
-           hide .env .git .gitignore
-       }
-   }
-   ```
+To add a project, drop it in `~/Sites`; no server config change is needed.
 
-2. Start the matching PHP preset, then the **Caddy** preset.
-3. Open `http://myproject.localhost:8080`.
+Laravel apps need `/public/` appended: `.../bowwow/public/`.
 
-`*.localhost` resolves to 127.0.0.1 natively — no DNS or hosts edits. Dotfiles are denied.
-
-There is no add-site form yet; blocks are hand-written.
-
-## Browse any folder on one host
-
-A generic block serves every folder in `~/Sites` at `http://localhost:8080/<folder>/`,
-with dotfiles denied and directory listing enabled. `docs/Caddyfile.example`
-holds a copy.
-
-Works well for plain-PHP apps — `http://localhost:8080/erp/` reaches the ERP
-login page.
-
-Limits, all real:
+## Limits of path hosting
 
 - **Laravel apps need `/public/`** appended: `.../bowwow/public/`. Their
   `index.php` lives there, so the bare folder falls through to the root
   `index.php` and lands on the dashboard page instead.
-- **One PHP version for every folder.** The portal pins 8.1; apps needing 8.3
-  or 8.5 need their own `.localhost` block.
+- **One PHP version for every folder.** Apache pins 8.1; apps needing 8.3 or
+  8.5 would need their own vhost (not built yet).
 - **Cookies collide.** All folders share the `localhost` host, so apps using
   `PHPSESSID` overwrite each other's session — logging into one logs you out
   of another.

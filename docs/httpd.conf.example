@@ -1,0 +1,58 @@
+# Stackdeck Apache — loopback only, .htaccess honoured, PHP via FPM.
+ServerRoot "/opt/homebrew/opt/httpd"
+
+Listen 127.0.0.1:8080
+ServerName localhost
+
+PidFile "/Users/cyasitha/Library/Application Support/Stackdeck/run/httpd.pid"
+ErrorLog "/Users/cyasitha/Library/Application Support/Stackdeck/log/httpd.err.log"
+CustomLog "/Users/cyasitha/Library/Application Support/Stackdeck/log/httpd.access.log" common
+LogLevel warn
+
+User cyasitha
+Group staff
+
+LoadModule mpm_event_module lib/httpd/modules/mod_mpm_event.so
+LoadModule authn_core_module lib/httpd/modules/mod_authn_core.so
+LoadModule authn_file_module lib/httpd/modules/mod_authn_file.so
+LoadModule authz_core_module lib/httpd/modules/mod_authz_core.so
+LoadModule authz_host_module lib/httpd/modules/mod_authz_host.so
+LoadModule authz_user_module lib/httpd/modules/mod_authz_user.so
+LoadModule auth_basic_module lib/httpd/modules/mod_auth_basic.so
+LoadModule access_compat_module lib/httpd/modules/mod_access_compat.so
+LoadModule dir_module lib/httpd/modules/mod_dir.so
+LoadModule mime_module lib/httpd/modules/mod_mime.so
+LoadModule log_config_module lib/httpd/modules/mod_log_config.so
+LoadModule unixd_module lib/httpd/modules/mod_unixd.so
+LoadModule headers_module lib/httpd/modules/mod_headers.so
+LoadModule setenvif_module lib/httpd/modules/mod_setenvif.so
+LoadModule filter_module lib/httpd/modules/mod_filter.so
+LoadModule deflate_module lib/httpd/modules/mod_deflate.so
+LoadModule rewrite_module lib/httpd/modules/mod_rewrite.so
+LoadModule proxy_module lib/httpd/modules/mod_proxy.so
+LoadModule proxy_fcgi_module lib/httpd/modules/mod_proxy_fcgi.so
+
+TypesConfig "/opt/homebrew/etc/httpd/mime.types"
+AddType application/x-httpd-php .php
+
+DocumentRoot "/Users/cyasitha/Sites"
+
+<Directory "/Users/cyasitha/Sites">
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+    DirectoryIndex index.php index.html
+
+    # PHP goes to the FPM pool, never embedded.
+    <FilesMatch "\.php$">
+        SetHandler "proxy:unix:/Users/cyasitha/Library/Application Support/Stackdeck/run/php81.sock|fcgi://localhost"
+    </FilesMatch>
+
+    # Dotfiles stay private, matching the old XAMPP habit.
+    <FilesMatch "^\.env">
+        Require all denied
+    </FilesMatch>
+    <FilesMatch "^\.git">
+        Require all denied
+    </FilesMatch>
+</Directory>
