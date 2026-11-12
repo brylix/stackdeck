@@ -51,6 +51,117 @@
       </section>
     </main>
 
+    <section class="help" aria-labelledby="help-h">
+      <h2 id="help-h">Help</h2>
+
+      <details open>
+        <summary>What this app does — and does not</summary>
+        <p>
+          Stackdeck starts, supervises and stops the local services your projects need, and provisions
+          them with generated credentials. Servers run loopback-only and die with the app: closing it
+          stops everything instead of leaving an orphaned database behind.
+        </p>
+        <p class="warn">
+          Not built yet: per-site virtual hosts and Caddy. Right now Stackdeck manages <em>processes</em>,
+          not <em>sites</em> — there is no <code>myproject.localhost</code> yet.
+        </p>
+      </details>
+
+      <details>
+        <summary>1. First run</summary>
+        <ol>
+          <li>Open the <strong>Setup</strong> panel. Each service shows <em>not installed</em>.</li>
+          <li>Press <strong>Install</strong>. Homebrew installs it; the row updates on its own.</li>
+          <li>Press <strong>Set up</strong>. Credentials are generated — you never type one.</li>
+          <li>Every row reads <strong>ready</strong> when the machine is prepared.</li>
+        </ol>
+        <p>Installs need Homebrew and an internet connection. Set up is idempotent; running it again keeps the existing password.</p>
+      </details>
+
+      <details>
+        <summary>2. Starting and stopping services</summary>
+        <ol>
+          <li>Pick a <strong>Preset</strong> — it fills <em>Name</em>, <em>Program</em> and <em>Args</em>.</li>
+          <li>Press <strong>Start</strong>.</li>
+          <li>The service appears under <strong>Running</strong> with its pid. Press <strong>Stop</strong> to end it, or stop the whole tree by quitting the app.</li>
+        </ol>
+        <p class="warn">Start MariaDB before anything that needs a database. PHP alone serves nothing.</p>
+        <p>
+          Start order that works: <strong>MariaDB → PHP → phpMyAdmin</strong>. Each server needs a few seconds
+          before it accepts connections.
+        </p>
+      </details>
+
+      <details>
+        <summary>3. Addresses and ports</summary>
+        <table>
+          <tr><th>Service</th><th>Address</th><th>Bound to</th></tr>
+          <tr><td>MariaDB</td><td><code>127.0.0.1:3306</code>, socket <code>/tmp/stackdeck.sock</code></td><td>all interfaces</td></tr>
+          <tr><td>phpMyAdmin</td><td><code>http://127.0.0.1:8081</code></td><td>loopback only</td></tr>
+          <tr><td>PHP-FPM</td><td>unix socket, no TCP port</td><td>sockets</td></tr>
+        </table>
+        <p>MariaDB listens on all interfaces because the LAN/devices need it — it is password-protected. phpMyAdmin and FPM never leave the machine.</p>
+      </details>
+
+      <details>
+        <summary>4. Credentials</summary>
+        <p>The MariaDB root password is generated at setup and stored in your <strong>Keychain</strong> as service <code>stackdeck-mariadb</code>.</p>
+        <pre>security find-generic-password -s stackdeck-mariadb -w</pre>
+        <p>User is <code>root</code>. phpMyAdmin's own secret lives in its config and needs no attention.</p>
+        <p class="warn">App <code>.env</code> files still need this password. Imported projects ship with an empty <code>DB_PASSWORD</code>.</p>
+      </details>
+
+      <details>
+        <summary>5. Choosing a PHP version</summary>
+        <p>Versions are installed side by side; each has its own socket, so they do not collide.</p>
+        <table>
+          <tr><th>Preset</th><th>Use for</th></tr>
+          <tr><td>PHP 8.5</td><td>new work — breaks Laravel 10 and older</td></tr>
+          <tr><td>PHP 8.3</td><td>Laravel 10 / 11</td></tr>
+          <tr><td>PHP 8.1</td><td>Laravel 8 / 9 legacy</td></tr>
+        </table>
+        <p>If a project 500s with a parse error, it is almost always the wrong PHP version.</p>
+      </details>
+
+      <details>
+        <summary>6. Where files live</summary>
+        <pre>~/Library/Application Support/Stackdeck/
+  data/          MariaDB datadir
+  phpmyadmin/    symlinks + generated config
+  run/           PHP-FPM sockets and pid files
+  log/           service logs
+  tmp/           phpMyAdmin scratch</pre>
+        <p>Service output goes to <code>log/&lt;service&gt;.out.log</code> and <code>.err.log</code>. Read those first when a service will not stay up.</p>
+      </details>
+
+      <details>
+        <summary>7. Troubleshooting</summary>
+        <dl>
+          <dt>“Address already in use”</dt>
+          <dd>Something else holds the port — often XAMPP. Check with <code>lsof -nP -iTCP:3306 -sTCP:LISTEN</code>.</dd>
+          <dt>Service starts then disappears</dt>
+          <dd>Read <code>log/&lt;service&gt;.err.log</code>. A datadir permission problem or a missing package shows there.</dd>
+          <dt>Row stuck on “not installed”</dt>
+          <dd>Homebrew failed. Run <code>brew install &lt;formula&gt;</code> in a terminal to see the real error.</dd>
+          <dt>phpMyAdmin cannot log in</dt>
+          <dd>Confirm MariaDB is running first, and copy the password from Keychain exactly.</dd>
+          <dt>“command not found” for <code>mysql</code></dt>
+          <dd>Use the full path <code>/opt/homebrew/opt/mariadb/bin/mariadb</code>; XAMPP still shadows the short name.</dd>
+        </dl>
+      </details>
+
+      <details>
+        <summary>8. Known limitations</summary>
+        <ul>
+          <li>No Caddy, no per-site vhosts — see 1.</li>
+          <li>phpMyAdmin runs on PHP's built-in server: single-threaded, HTTP only.</li>
+          <li>macOS only. The Windows manifest exists but nothing reads it.</li>
+          <li>Presets contain absolute paths, so this only runs from a source checkout.</li>
+          <li>No import wizard; `.env` rewriting is manual.</li>
+        </ul>
+      </details>
+    </section>
+
     <script src="app.js"></script>
   </body>
 </html>

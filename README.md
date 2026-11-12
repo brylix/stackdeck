@@ -31,6 +31,9 @@ cargo check -p supervisor     # logic crate, fast
 cargo tauri dev               # full app
 ```
 
+See [docs/USAGE.md](docs/USAGE.md) for how to use the app, and
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for design decisions.
+
 Component binaries are not committed. On macOS they come from Homebrew; on
 Windows from the pinned manifest.
 
