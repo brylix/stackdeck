@@ -146,6 +146,8 @@
           <dd>Read <code>log/&lt;service&gt;.err.log</code>. A datadir permission problem or a missing package shows there.</dd>
           <dt>Row stuck on “not installed”</dt>
           <dd>Homebrew failed. Run <code>brew install &lt;formula&gt;</code> in a terminal to see the real error.</dd>
+          <dt>“No such file or directory” on mysqli / localhost</dt>
+          <dd>PHP treats <code>localhost</code> as a unix socket and looks for <code>/tmp/mysql.sock</code>. The server listens on <code>/tmp/stackdeck.sock</code>; recreate the alias with <code>ln -sf /tmp/stackdeck.sock /tmp/mysql.sock</code>. <code>/tmp</code> is cleared on reboot.</dd>
           <dt>phpMyAdmin cannot log in</dt>
           <dd>Confirm MariaDB is running first, and copy the password from Keychain exactly.</dd>
           <dt>“command not found” for <code>mysql</code></dt>
