@@ -2,6 +2,7 @@
 ServerRoot "/opt/homebrew/opt/httpd"
 
 Listen 127.0.0.1:8080
+Listen [::1]:8080
 ServerName localhost
 
 PidFile "/Users/cyasitha/Library/Application Support/Stackdeck/run/httpd.pid"

@@ -52,6 +52,34 @@ Laravel apps need `/public/` appended: `.../bowwow/public/`.
 Use the portal for quick checks; keep a `.localhost` block per app for real
 work, especially Laravel.
 
+## Dropping `:8080` from URLs
+
+Port 80 needs root, but a root Apache can't be stopped by the app. Instead the
+kernel redirects loopback 80 → 8080, so supervision stays intact.
+
+`http://erp.localhost/` now works; `:8080` also still works.
+
+Files touched (all root-owned):
+
+```
+/etc/pf.anchors/stackdeck              redirect rules
+/etc/pf.conf                           anchor registered (order matters)
+/Library/LaunchDaemons/dev.stackdeck.pf.plist   re-applies at boot
+```
+
+If port 80 stops redirecting:
+
+```bash
+sudo pfctl -f /etc/pf.conf && sudo pfctl -E
+sudo pfctl -a stackdeck -s rules          # should list two rdr rules
+```
+
+Undo with `sudo launchctl bootout system/dev.stackdeck.pf`, then remove the
+anchor lines from `/etc/pf.conf` (backup at `/etc/pf.conf.stackdeck-bak`).
+
+Note this enables pf system-wide. Its default policy is pass-all, so it filters
+nothing beyond these redirects.
+
 ## Ports
 
 | Service | Address | Bound |
